@@ -157,12 +157,10 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                 <Button 
                   size="lg" 
                   className="w-full"
-                  onClick={() => {
-                    // TODO: Redirect to Lightspeed checkout
-                    onOpenChange(false);
-                  }}
+                  asChild
+                  onClick={() => onOpenChange(false)}
                 >
-                  Checkout
+                  <Link to="/checkout">Proceed to Checkout</Link>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -171,7 +169,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                   asChild
                   onClick={() => onOpenChange(false)}
                 >
-                  <Link to="/cart">View Cart</Link>
+                  <Link to="/shop">Continue Shopping</Link>
                 </Button>
               </div>
             </div>
