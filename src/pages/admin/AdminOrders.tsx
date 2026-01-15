@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Order, OrderItem } from "@/types";
+import { OrderStatus, OrderItem, Address } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +31,29 @@ import { Search, Eye, Clock, CheckCircle, Truck, Package, XCircle } from "lucide
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 
-type OrderWithItems = Order & { items?: OrderItem[] };
+interface OrderRow {
+  id: string;
+  order_number: string;
+  user_id: string | null;
+  email: string;
+  status: OrderStatus;
+  subtotal: number;
+  shipping_cost: number | null;
+  tax_amount: number | null;
+  discount_amount: number | null;
+  total: number;
+  currency: string | null;
+  shipping_address: Address | null;
+  billing_address: Address | null;
+  tracking_number: string | null;
+  tracking_carrier: string | null;
+  notes: string | null;
+  admin_notes: string | null;
+  lightspeed_order_id: string | null;
+  created_at: string;
+  updated_at: string;
+  items?: OrderItem[];
+}
 
 const statusConfig: Record<string, { label: string; color: string; icon: typeof Clock }> = {
   pending: { label: "Pending", color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -44,11 +66,11 @@ const statusConfig: Record<string, { label: string; color: string; icon: typeof 
 };
 
 export default function AdminOrders() {
-  const [orders, setOrders] = useState<OrderWithItems[]>([]);
+  const [orders, setOrders] = useState<OrderRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -63,7 +85,7 @@ export default function AdminOrders() {
         .order("created_at", { ascending: false });
 
       if (statusFilter !== "all") {
-        query = query.eq("status", statusFilter);
+        query = query.eq("status", statusFilter as OrderStatus);
       }
 
       if (searchQuery) {
@@ -72,7 +94,15 @@ export default function AdminOrders() {
 
       const { data, error } = await query;
       if (error) throw error;
-      setOrders(data || []);
+      
+      // Map the data to ensure proper typing
+      const mappedOrders: OrderRow[] = (data || []).map((order) => ({
+        ...order,
+        shipping_address: order.shipping_address as unknown as Address | null,
+        billing_address: order.billing_address as unknown as Address | null,
+      }));
+      
+      setOrders(mappedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       toast.error("Failed to load orders");
@@ -86,12 +116,12 @@ export default function AdminOrders() {
     return data || [];
   };
 
-  const handleViewOrder = async (order: OrderWithItems) => {
+  const handleViewOrder = async (order: OrderRow) => {
     const items = await fetchOrderItems(order.id);
     setSelectedOrder({ ...order, items });
   };
 
-  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+  const handleUpdateStatus = async (orderId: string, newStatus: OrderStatus) => {
     try {
       const { error } = await supabase
         .from("orders")
@@ -102,7 +132,7 @@ export default function AdminOrders() {
       toast.success("Order status updated");
       fetchOrders();
       if (selectedOrder?.id === orderId) {
-        setSelectedOrder({ ...selectedOrder, status: newStatus as Order["status"] });
+        setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
     } catch (error) {
       console.error("Error updating order:", error);
@@ -205,7 +235,7 @@ export default function AdminOrders() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>{getStatusBadge(selectedOrder.status)}</div>
-                <Select value={selectedOrder.status} onValueChange={(v) => handleUpdateStatus(selectedOrder.id, v)}>
+                <Select value={selectedOrder.status} onValueChange={(v) => handleUpdateStatus(selectedOrder.id, v as OrderStatus)}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue />
                   </SelectTrigger>
