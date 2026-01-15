@@ -14,7 +14,7 @@ export function HeroSection() {
             backgroundImage: `url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070&auto=format&fit=crop')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-secondary/95 via-secondary/70 to-secondary/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/85 to-secondary/50" />
       </div>
 
       {/* Content */}
