@@ -530,6 +530,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sync_logs: {
+        Row: {
+          created_at: string | null
+          entity_id: string
+          error_message: string | null
+          event_type: string
+          id: string
+          local_id: string | null
+          payload: Json | null
+          processed_at: string | null
+          source: string
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id: string
+          error_message?: string | null
+          event_type: string
+          id?: string
+          local_id?: string | null
+          payload?: Json | null
+          processed_at?: string | null
+          source: string
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          local_id?: string | null
+          payload?: Json | null
+          processed_at?: string | null
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

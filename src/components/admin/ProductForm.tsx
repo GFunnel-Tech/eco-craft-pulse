@@ -99,25 +99,36 @@ export function ProductForm({ product, categories, onSuccess, onCancel }: Produc
   const onSubmit = async (values: ProductFormValues) => {
     setIsSubmitting(true);
     try {
-      const data = {
-        ...values,
-        category_id: values.category_id === "none" ? null : values.category_id,
+      const insertData = {
+        name: values.name,
+        sku: values.sku,
+        slug: values.slug,
+        description: values.description || null,
+        short_description: values.short_description || null,
+        price: values.price,
         compare_at_price: values.compare_at_price || null,
         cost_price: values.cost_price || null,
+        category_id: values.category_id === "none" ? null : values.category_id || null,
+        brand: values.brand || null,
+        material: values.material || null,
+        care_instructions: values.care_instructions || null,
+        is_active: values.is_active ?? true,
+        is_featured: values.is_featured ?? false,
+        is_new: values.is_new ?? false,
+        meta_title: values.meta_title || null,
+        meta_description: values.meta_description || null,
+        tags: null,
       };
 
       if (product) {
         const { error } = await supabase
           .from("products")
-          .update(data)
+          .update(insertData)
           .eq("id", product.id);
         if (error) throw error;
         toast.success("Product updated successfully");
       } else {
-        const { error } = await supabase.from("products").insert([data]);
-        if (error) throw error;
-        toast.success("Product created successfully");
-      }
+        const { error } = await supabase.from("products").insert([insertData]);
         if (error) throw error;
         toast.success("Product created successfully");
       }
