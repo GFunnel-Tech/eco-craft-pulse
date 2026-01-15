@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Twitter, Facebook } from 'lucide-react';
+import { Instagram, Facebook } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { NAVIGATION, SITE_NAME, SITE_TAGLINE } from '@/lib/constants';
@@ -58,7 +58,7 @@ export function Footer() {
             {/* Social Links */}
             <div className="flex gap-4 mt-6">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/korrapparel/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -66,15 +66,7 @@ export function Footer() {
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/people/KORR/61575679605898/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors"

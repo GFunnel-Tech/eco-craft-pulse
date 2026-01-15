@@ -27,9 +27,8 @@ export const NAVIGATION = {
     { name: 'Terms of Service', href: '/terms' },
   ],
   social: [
-    { name: 'Instagram', href: 'https://instagram.com', icon: 'Instagram' },
-    { name: 'Twitter', href: 'https://twitter.com', icon: 'Twitter' },
-    { name: 'Facebook', href: 'https://facebook.com', icon: 'Facebook' },
+    { name: 'Instagram', href: 'https://www.instagram.com/korrapparel/', icon: 'Instagram' },
+    { name: 'Facebook', href: 'https://www.facebook.com/people/KORR/61575679605898/', icon: 'Facebook' },
   ],
 };
 
