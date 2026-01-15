@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function HeroSection() {
@@ -66,14 +66,6 @@ export function HeroSection() {
                 Shop Now
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-base px-8 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <Play className="mr-2 h-5 w-5" />
-              Watch Film
             </Button>
           </motion.div>
         </div>
