@@ -148,7 +148,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/account/wishlist')}
+              onClick={() => navigate(user ? '/account?tab=wishlist' : '/login?redirect=/account?tab=wishlist')}
               className="relative"
             >
               <Heart className="h-5 w-5" />
@@ -187,10 +187,10 @@ export function Header() {
                     <Link to="/account">My Account</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/account/orders">Orders</Link>
+                    <Link to="/account?tab=orders">Orders</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/account/wishlist">Wishlist</Link>
+                    <Link to="/account?tab=wishlist">Wishlist</Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <>
