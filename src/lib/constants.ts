@@ -1,8 +1,8 @@
 // Application constants
 
-export const SITE_NAME = 'Coral';
+export const SITE_NAME = 'KORR';
 export const SITE_TAGLINE = 'Performance Apparel';
-export const SITE_DESCRIPTION = 'Premium performance apparel designed for athletes who demand excellence.';
+export const SITE_DESCRIPTION = 'Premium performance apparel designed for athletes who demand excellence. Shop KORR for high-quality athletic wear.';
 
 export const NAVIGATION = {
   main: [

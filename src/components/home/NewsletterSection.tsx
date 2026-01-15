@@ -31,7 +31,7 @@ export function NewsletterSection() {
       return;
     }
 
-    toast.success('Welcome to the Coral family!');
+    toast.success('Welcome to the KORR family!');
     setEmail('');
   };
 
