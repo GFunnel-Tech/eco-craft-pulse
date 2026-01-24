@@ -60,7 +60,9 @@ export default function ProductDetail() {
         const availableColors = [...new Set(activeVariants.map(v => v.color).filter(Boolean))];
         const availableSizes = [...new Set(activeVariants.map(v => v.size).filter(Boolean))];
         
-        if (availableColors.length > 0) setSelectedColor(availableColors[0]!);
+        if (availableColors.length > 0) {
+          setSelectedColor(availableColors[0]!);
+        }
         if (availableSizes.length > 0) setSelectedSize(availableSizes[0]!);
 
         // Fetch related products
@@ -109,12 +111,35 @@ export default function ProductDetail() {
   const finalPrice = (product?.price || 0) + (selectedVariant?.price_adjustment || 0);
   const hasDiscount = product?.compare_at_price && product.compare_at_price > product.price;
 
-  // Sort images
-  const sortedImages = product?.images?.sort((a, b) => {
+  // Get the selected color's hex value for image filtering
+  const selectedColorHex = availableColors.find(c => c.color === selectedColor)?.hex;
+
+  // Filter and sort images based on selected color
+  // Show images that match the selected color OR are general images (no color_hex assigned)
+  const filteredImages = product?.images?.filter(img => {
+    // General images (no color assigned) are always shown
+    if (!img.color_hex) return true;
+    // If a color is selected, show images matching that color
+    if (selectedColorHex) {
+      return img.color_hex?.toLowerCase() === selectedColorHex?.toLowerCase();
+    }
+    // If no color selected, show all images
+    return true;
+  }) || [];
+
+  // Sort images: primary first, then by sort_order
+  const sortedImages = [...filteredImages].sort((a, b) => {
     if (a.is_primary) return -1;
     if (b.is_primary) return 1;
-    return a.sort_order - b.sort_order;
-  }) || [];
+    return (a.sort_order || 0) - (b.sort_order || 0);
+  });
+
+  // Reset selected image when color changes and current selection is out of bounds
+  useEffect(() => {
+    if (selectedImage >= sortedImages.length) {
+      setSelectedImage(0);
+    }
+  }, [selectedColor, sortedImages.length, selectedImage]);
 
   const handleAddToCart = async () => {
     if (!product) return;
