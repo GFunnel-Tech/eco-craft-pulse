@@ -5,16 +5,16 @@ import { Button } from '@/components/ui/button';
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-      {/* Background Video/Image */}
-      <div className="absolute inset-0 bg-secondary">
+    <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-background">
+      {/* Background Image */}
+      <div className="absolute inset-0">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070&auto=format&fit=crop')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/85 to-secondary/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/90 to-secondary/60" />
       </div>
 
       {/* Content */}
@@ -25,24 +25,24 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/20 text-primary text-sm font-medium mb-6">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-muted-foreground/20 text-secondary-foreground text-sm font-medium mb-6 tracking-wide">
               New Collection 2025
             </span>
           </motion.div>
 
           <motion.h1
-            className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-primary-foreground leading-[1.1] mb-6"
+            className="font-display text-5xl md:text-6xl lg:text-7xl font-medium text-secondary-foreground leading-[1.1] mb-6"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             Elevate Your
             <br />
-            <span className="text-gradient-coral">Performance</span>
+            <span className="text-secondary-foreground">Performance</span>
           </motion.h1>
 
           <motion.p
-            className="text-lg md:text-xl text-secondary-foreground/80 mb-8 max-w-lg"
+            className="text-lg md:text-xl text-secondary-foreground/80 mb-8 max-w-lg font-sans"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -59,7 +59,7 @@ export function HeroSection() {
           >
             <Button 
               size="lg" 
-              className="text-base px-8 shadow-coral"
+              className="text-base px-8 font-sans"
               asChild
             >
               <Link to="/shop">
@@ -79,11 +79,11 @@ export function HeroSection() {
         transition={{ delay: 1.5 }}
       >
         <motion.div
-          className="w-6 h-10 rounded-full border-2 border-primary-foreground/30 flex justify-center pt-2"
+          className="w-6 h-10 rounded-full border-2 border-secondary-foreground/30 flex justify-center pt-2"
           animate={{ y: [0, 5, 0] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
         >
-          <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground/50" />
+          <div className="w-1.5 h-1.5 rounded-full bg-secondary-foreground/50" />
         </motion.div>
       </motion.div>
     </section>

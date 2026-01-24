@@ -37,20 +37,20 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-secondary text-secondary-foreground">
+    <footer className="bg-primary text-primary-foreground">
       <div className="container py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="inline-block">
-              <h3 className="font-display text-2xl font-bold text-primary-foreground">
+              <h3 className="font-display text-2xl font-medium text-primary-foreground">
                 {SITE_NAME}
               </h3>
             </Link>
-            <p className="mt-2 text-sm text-secondary-foreground/70">
+            <p className="mt-2 text-sm text-primary-foreground/70 font-sans">
               {SITE_TAGLINE}
             </p>
-            <p className="mt-4 text-sm text-secondary-foreground/60 leading-relaxed">
+            <p className="mt-4 text-sm text-primary-foreground/60 leading-relaxed font-sans">
               Premium performance apparel designed for athletes who demand excellence. 
               Engineered for comfort, built for performance.
             </p>
@@ -61,7 +61,7 @@ export function Footer() {
                 href="https://www.instagram.com/korrapparel/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="p-2 rounded-full bg-primary-foreground/10 hover:bg-muted-foreground hover:text-primary-foreground transition-colors"
               >
                 <Instagram className="h-5 w-5" />
               </a>
@@ -69,7 +69,7 @@ export function Footer() {
                 href="https://www.facebook.com/people/KORR/61575679605898/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="p-2 rounded-full bg-primary-foreground/10 hover:bg-muted-foreground hover:text-primary-foreground transition-colors"
               >
                 <Facebook className="h-5 w-5" />
               </a>
@@ -78,13 +78,13 @@ export function Footer() {
 
           {/* Shop Links */}
           <div>
-            <h4 className="font-semibold text-primary-foreground mb-4">Shop</h4>
+            <h4 className="font-sans font-semibold text-primary-foreground mb-4">Shop</h4>
             <ul className="space-y-3">
               {NAVIGATION.categories.map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.href}
-                    className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors"
+                    className="text-sm text-primary-foreground/70 hover:text-muted-foreground transition-colors font-sans"
                   >
                     {item.name}
                   </Link>
@@ -93,7 +93,7 @@ export function Footer() {
               <li>
                 <Link
                   to="/shop?filter=new"
-                  className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors"
+                  className="text-sm text-primary-foreground/70 hover:text-muted-foreground transition-colors font-sans"
                 >
                   New Arrivals
                 </Link>
@@ -101,7 +101,7 @@ export function Footer() {
               <li>
                 <Link
                   to="/shop?filter=sale"
-                  className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors"
+                  className="text-sm text-primary-foreground/70 hover:text-muted-foreground transition-colors font-sans"
                 >
                   Sale
                 </Link>
@@ -111,13 +111,13 @@ export function Footer() {
 
           {/* Support Links */}
           <div>
-            <h4 className="font-semibold text-primary-foreground mb-4">Support</h4>
+            <h4 className="font-sans font-semibold text-primary-foreground mb-4">Support</h4>
             <ul className="space-y-3">
               {NAVIGATION.support.map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.href}
-                    className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors"
+                    className="text-sm text-primary-foreground/70 hover:text-muted-foreground transition-colors font-sans"
                   >
                     {item.name}
                   </Link>
@@ -128,8 +128,8 @@ export function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h4 className="font-semibold text-primary-foreground mb-4">Stay in the Loop</h4>
-            <p className="text-sm text-secondary-foreground/70 mb-4">
+            <h4 className="font-sans font-semibold text-primary-foreground mb-4">Stay in the Loop</h4>
+            <p className="text-sm text-primary-foreground/70 mb-4 font-sans">
               Subscribe to get special offers, free giveaways, and new arrivals.
             </p>
             <form onSubmit={handleNewsletterSubmit} className="space-y-3">
@@ -138,12 +138,13 @@ export function Footer() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-secondary-foreground/10 border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50"
+                className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 font-sans"
                 required
               />
               <Button 
                 type="submit" 
-                className="w-full"
+                variant="secondary"
+                className="w-full font-sans"
                 disabled={isSubscribing}
               >
                 {isSubscribing ? 'Subscribing...' : 'Subscribe'}
@@ -153,8 +154,8 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-secondary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-secondary-foreground/60">
+        <div className="mt-16 pt-8 border-t border-foreground/20 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-primary-foreground/60 font-sans">
             © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
           </p>
           <div className="flex gap-6">
@@ -162,7 +163,7 @@ export function Footer() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-sm text-secondary-foreground/60 hover:text-primary transition-colors"
+                className="text-sm text-primary-foreground/60 hover:text-muted-foreground transition-colors font-sans"
               >
                 {item.name}
               </Link>

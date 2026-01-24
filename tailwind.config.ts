@@ -61,18 +61,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Coral brand colors
-        coral: {
-          DEFAULT: "hsl(var(--coral))",
-          dark: "hsl(var(--coral-dark))",
-          light: "hsl(var(--coral-light))",
-        },
-        navy: {
-          DEFAULT: "hsl(var(--navy))",
-          light: "hsl(var(--navy-light))",
-        },
-        sand: "hsl(var(--sand))",
-        cream: "hsl(var(--cream))",
+        // KORR brand colors
+        "soft-grey": "hsl(var(--soft-grey))",
+        "editorial-grey": "hsl(var(--editorial-grey))",
+        "olive-grey": "hsl(var(--olive-grey))",
+        "body-text": "hsl(var(--body-text))",
+        divider: "hsl(var(--divider))",
       },
       borderRadius: {
         lg: "var(--radius)",

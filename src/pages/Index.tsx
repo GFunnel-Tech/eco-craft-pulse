@@ -4,7 +4,6 @@ import { FeaturedProducts } from '@/components/home/FeaturedProducts';
 import { CategoryShowcase } from '@/components/home/CategoryShowcase';
 import { NewArrivals } from '@/components/home/NewArrivals';
 import { PromoSection } from '@/components/home/PromoSection';
-import { NewsletterSection } from '@/components/home/NewsletterSection';
 
 const Index = () => {
   return (
@@ -14,7 +13,6 @@ const Index = () => {
       <CategoryShowcase />
       <NewArrivals />
       <PromoSection />
-      <NewsletterSection />
     </MainLayout>
   );
 };
