@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -24,8 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { ProductVariantManager, ProductVariant } from "./ProductVariantManager";
+import { ProductImageManager, ProductImage } from "./ProductImageManager";
 
 const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -58,6 +61,9 @@ interface ProductFormProps {
 
 export function ProductForm({ product, categories, onSuccess, onCancel }: ProductFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("details");
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const [images, setImages] = useState<ProductImage[]>([]);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -82,6 +88,41 @@ export function ProductForm({ product, categories, onSuccess, onCancel }: Produc
     },
   });
 
+  // Load existing variants and images when editing
+  useEffect(() => {
+    if (product) {
+      // Load variants
+      if (product.variants && product.variants.length > 0) {
+        setVariants(
+          product.variants.map((v) => ({
+            id: v.id,
+            sku: v.sku,
+            size: v.size,
+            color: v.color,
+            color_hex: v.color_hex,
+            price_adjustment: v.price_adjustment || 0,
+            stock_quantity: v.stock_quantity,
+            low_stock_threshold: v.low_stock_threshold || 10,
+            is_active: v.is_active ?? true,
+          }))
+        );
+      }
+      // Load images
+      if (product.images && product.images.length > 0) {
+        setImages(
+          product.images.map((img) => ({
+            id: img.id,
+            url: img.url,
+            alt_text: img.alt_text,
+            is_primary: img.is_primary ?? false,
+            sort_order: img.sort_order ?? 0,
+            color_hex: (img as any).color_hex || null,
+          }))
+        );
+      }
+    }
+  }, [product]);
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -96,10 +137,17 @@ export function ProductForm({ product, categories, onSuccess, onCancel }: Produc
     }
   };
 
+  // Get unique colors from variants for image assignment
+  const availableColors = [...new Map(
+    variants
+      .filter((v) => v.color && v.color_hex)
+      .map((v) => [v.color_hex, { color: v.color!, hex: v.color_hex! }])
+  ).values()];
+
   const onSubmit = async (values: ProductFormValues) => {
     setIsSubmitting(true);
     try {
-      const insertData = {
+      const productData = {
         name: values.name,
         sku: values.sku,
         slug: values.slug,
@@ -120,19 +168,102 @@ export function ProductForm({ product, categories, onSuccess, onCancel }: Produc
         tags: null,
       };
 
+      let productId = product?.id;
+
       if (product) {
         const { error } = await supabase
           .from("products")
-          .update(insertData)
+          .update(productData)
           .eq("id", product.id);
         if (error) throw error;
-        toast.success("Product updated successfully");
       } else {
-        const { error } = await supabase.from("products").insert([insertData]);
+        const { data, error } = await supabase
+          .from("products")
+          .insert([productData])
+          .select("id")
+          .single();
         if (error) throw error;
-        toast.success("Product created successfully");
+        productId = data.id;
       }
 
+      if (!productId) throw new Error("Failed to get product ID");
+
+      // Handle variants
+      if (product) {
+        // Delete removed variants
+        const existingIds = variants.filter((v) => v.id).map((v) => v.id);
+        if (product.variants) {
+          const toDelete = product.variants
+            .filter((v) => !existingIds.includes(v.id))
+            .map((v) => v.id);
+          if (toDelete.length > 0) {
+            await supabase.from("product_variants").delete().in("id", toDelete);
+          }
+        }
+      }
+
+      // Upsert variants
+      for (const variant of variants) {
+        const variantData = {
+          product_id: productId,
+          sku: variant.sku,
+          size: variant.size,
+          color: variant.color,
+          color_hex: variant.color_hex,
+          price_adjustment: variant.price_adjustment,
+          stock_quantity: variant.stock_quantity,
+          low_stock_threshold: variant.low_stock_threshold,
+          is_active: variant.is_active,
+        };
+
+        if (variant.id) {
+          await supabase
+            .from("product_variants")
+            .update(variantData)
+            .eq("id", variant.id);
+        } else {
+          await supabase.from("product_variants").insert([variantData]);
+        }
+      }
+
+      // Handle images
+      if (product) {
+        // Delete removed images
+        const existingImageIds = images.filter((img) => img.id).map((img) => img.id);
+        if (product.images) {
+          const toDeleteImages = product.images
+            .filter((img) => !existingImageIds.includes(img.id))
+            .map((img) => img.id);
+          if (toDeleteImages.length > 0) {
+            await supabase.from("product_images").delete().in("id", toDeleteImages);
+          }
+        }
+      }
+
+      // Upsert images
+      for (const image of images) {
+        if (!image.url) continue;
+
+        const imageData = {
+          product_id: productId,
+          url: image.url,
+          alt_text: image.alt_text,
+          is_primary: image.is_primary,
+          sort_order: image.sort_order,
+          color_hex: image.color_hex,
+        };
+
+        if (image.id) {
+          await supabase
+            .from("product_images")
+            .update(imageData)
+            .eq("id", image.id);
+        } else {
+          await supabase.from("product_images").insert([imageData]);
+        }
+      }
+
+      toast.success(product ? "Product updated successfully" : "Product created successfully");
       onSuccess();
     } catch (error: any) {
       console.error("Error saving product:", error);
@@ -142,297 +273,338 @@ export function ProductForm({ product, categories, onSuccess, onCancel }: Produc
     }
   };
 
+  const watchedSku = form.watch("sku");
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Name</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder="Performance Running Tee"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="variants">
+              Variants {variants.length > 0 && `(${variants.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="images">
+              Images {images.length > 0 && `(${images.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="seo">SEO</TabsTrigger>
+          </TabsList>
 
-          <FormField
-            control={form.control}
-            name="sku"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SKU</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="KORR-TEE-001" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <TabsContent value="details" className="space-y-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        onChange={(e) => handleNameChange(e.target.value)}
+                        placeholder="Performance Running Tee"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <FormField
-          control={form.control}
-          name="slug"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>URL Slug</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="performance-running-tee" />
-              </FormControl>
-              <FormDescription>Used in product URLs</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+              <FormField
+                control={form.control}
+                name="sku"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SKU</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="KORR-TEE-001" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-        <FormField
-          control={form.control}
-          name="short_description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Short Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="A brief description for product cards..."
-                  rows={2}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Detailed product description..."
-                  rows={4}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price</FormLabel>
-                <FormControl>
-                  <Input {...field} type="number" step="0.01" min="0" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="compare_at_price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Compare at Price</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={field.value || ""}
-                  />
-                </FormControl>
-                <FormDescription>Original price for sales</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="cost_price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Cost Price</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={field.value || ""}
-                  />
-                </FormControl>
-                <FormDescription>Your cost (private)</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="category_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <Select
-                  value={field.value || "none"}
-                  onValueChange={field.onChange}
-                >
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL Slug</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
+                    <Input {...field} placeholder="performance-running-tee" />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="none">No Category</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormDescription>Used in product URLs</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="brand"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Brand</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="KORR" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+            <FormField
+              control={form.control}
+              name="short_description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Short Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="A brief description for product cards..."
+                      rows={2}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="material"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Material</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="87% Polyester, 13% Spandex" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Detailed product description..."
+                      rows={4}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="care_instructions"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Care Instructions</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Machine wash cold, tumble dry low" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" step="0.01" min="0" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <div className="flex flex-wrap gap-6">
-          <FormField
-            control={form.control}
-            name="is_active"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-2">
-                <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-                <FormLabel className="!mt-0">Active</FormLabel>
-              </FormItem>
-            )}
-          />
+              <FormField
+                control={form.control}
+                name="compare_at_price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Compare at Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormDescription>Original price for sales</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <FormField
-            control={form.control}
-            name="is_featured"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-2">
-                <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-                <FormLabel className="!mt-0">Featured</FormLabel>
-              </FormItem>
-            )}
-          />
+              <FormField
+                control={form.control}
+                name="cost_price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cost Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormDescription>Your cost (private)</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          <FormField
-            control={form.control}
-            name="is_new"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-2">
-                <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-                <FormLabel className="!mt-0">New Arrival</FormLabel>
-              </FormItem>
-            )}
-          />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="category_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      value={field.value || "none"}
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">No Category</SelectItem>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="meta_title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SEO Title</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Product title for search engines" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <FormField
+                control={form.control}
+                name="brand"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Brand</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="KORR" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          <FormField
-            control={form.control}
-            name="meta_description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SEO Description</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Brief description for search results" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="material"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Material</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="87% Polyester, 13% Spandex" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="care_instructions"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Care Instructions</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Machine wash cold, tumble dry low" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-6">
+              <FormField
+                control={form.control}
+                name="is_active"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2">
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="!mt-0">Active</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_featured"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2">
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="!mt-0">Featured</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_new"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2">
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="!mt-0">New Arrival</FormLabel>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="variants" className="mt-6">
+            <ProductVariantManager
+              variants={variants}
+              onChange={setVariants}
+              productSku={watchedSku || "KORR"}
+            />
+          </TabsContent>
+
+          <TabsContent value="images" className="mt-6">
+            <ProductImageManager
+              images={images}
+              onChange={setImages}
+              availableColors={availableColors}
+            />
+          </TabsContent>
+
+          <TabsContent value="seo" className="space-y-6 mt-6">
+            <div className="grid grid-cols-1 gap-4">
+              <FormField
+                control={form.control}
+                name="meta_title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Product title for search engines" />
+                    </FormControl>
+                    <FormDescription>Recommended: under 60 characters</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="meta_description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Brief description for search results"
+                        rows={3}
+                      />
+                    </FormControl>
+                    <FormDescription>Recommended: under 160 characters</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
 
         <div className="flex justify-end gap-3 pt-4 border-t">
           <Button type="button" variant="outline" onClick={onCancel}>

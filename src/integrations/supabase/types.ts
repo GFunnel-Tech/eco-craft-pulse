@@ -323,6 +323,7 @@ export type Database = {
       product_images: {
         Row: {
           alt_text: string | null
+          color_hex: string | null
           created_at: string
           id: string
           is_primary: boolean | null
@@ -332,6 +333,7 @@ export type Database = {
         }
         Insert: {
           alt_text?: string | null
+          color_hex?: string | null
           created_at?: string
           id?: string
           is_primary?: boolean | null
@@ -341,6 +343,7 @@ export type Database = {
         }
         Update: {
           alt_text?: string | null
+          color_hex?: string | null
           created_at?: string
           id?: string
           is_primary?: boolean | null
