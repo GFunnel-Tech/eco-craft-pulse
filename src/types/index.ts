@@ -47,6 +47,7 @@ export interface ProductImage {
   alt_text: string | null;
   sort_order: number;
   is_primary: boolean;
+  color: string | null; // Links image to specific color, null = general image
   created_at: string;
 }
 

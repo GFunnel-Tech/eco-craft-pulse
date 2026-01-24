@@ -109,12 +109,34 @@ export default function ProductDetail() {
   const finalPrice = (product?.price || 0) + (selectedVariant?.price_adjustment || 0);
   const hasDiscount = product?.compare_at_price && product.compare_at_price > product.price;
 
-  // Sort images
-  const sortedImages = product?.images?.sort((a, b) => {
-    if (a.is_primary) return -1;
-    if (b.is_primary) return 1;
-    return a.sort_order - b.sort_order;
+  // Reset selected image when color changes to show color-specific images first
+  useEffect(() => {
+    setSelectedImage(0);
+  }, [selectedColor]);
+
+  // Filter and sort images based on selected color
+  // Show color-specific images for the selected color + general images (no color assigned)
+  const filteredImages = product?.images?.filter((img) => {
+    // Include general images (no color assigned) for all colors
+    if (!img.color) return true;
+    // Include color-specific images only if they match the selected color
+    return img.color === selectedColor;
   }) || [];
+
+  // Sort images: primary first, then by sort_order
+  const sortedImages = [...filteredImages].sort((a, b) => {
+    // Color-specific primary images first
+    if (a.color === selectedColor && a.is_primary) return -1;
+    if (b.color === selectedColor && b.is_primary) return 1;
+    // Then general primary images
+    if (a.is_primary && !a.color) return -1;
+    if (b.is_primary && !b.color) return 1;
+    // Then color-specific images
+    if (a.color === selectedColor && !b.color) return -1;
+    if (b.color === selectedColor && !a.color) return 1;
+    // Finally sort by sort_order
+    return a.sort_order - b.sort_order;
+  });
 
   const handleAddToCart = async () => {
     if (!product) return;
