@@ -47,6 +47,7 @@ export interface ProductImage {
   alt_text: string | null;
   sort_order: number;
   is_primary: boolean;
+  color_hex: string | null;
   created_at: string;
 }
 
