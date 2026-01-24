@@ -45,10 +45,10 @@ export function FeaturedProducts() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="text-primary font-medium uppercase tracking-wider text-sm">
+            <span className="text-muted-foreground font-sans font-medium uppercase tracking-wider text-sm">
               Curated Selection
             </span>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mt-2">
+            <h2 className="font-display text-3xl md:text-4xl font-medium text-primary mt-2">
               Featured Products
             </h2>
           </motion.div>
@@ -58,7 +58,7 @@ export function FeaturedProducts() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <Button variant="ghost" asChild className="hidden sm:flex">
+            <Button variant="ghost" asChild className="hidden sm:flex font-sans">
               <Link to="/shop?filter=featured">
                 View All
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -85,14 +85,14 @@ export function FeaturedProducts() {
 
         {products.length === 0 && !isLoading && (
           <div className="text-center py-16">
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground font-sans">
               No featured products yet. Check back soon!
             </p>
           </div>
         )}
 
         <div className="mt-8 text-center sm:hidden">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className="font-sans">
             <Link to="/shop?filter=featured">
               View All Featured
               <ArrowRight className="ml-2 h-4 w-4" />

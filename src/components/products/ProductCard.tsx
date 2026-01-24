@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, ShoppingBag, Eye } from 'lucide-react';
+import { Heart, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -62,7 +62,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
     >
       <Link to={`/product/${product.slug}`} className="block">
         {/* Image Container */}
-        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-editorial-grey border border-transparent hover:border-muted-foreground transition-colors">
           {/* Primary Image */}
           <img
             src={primaryImage || '/placeholder.svg'}
@@ -88,15 +88,15 @@ export function ProductCard({ product, className }: ProductCardProps) {
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {product.is_new && (
-              <Badge className="bg-secondary text-secondary-foreground">New</Badge>
+              <Badge className="bg-primary text-primary-foreground font-sans">New</Badge>
             )}
             {product.is_featured && (
-              <Badge variant="outline" className="bg-background/80 backdrop-blur-sm">
+              <Badge variant="outline" className="bg-background/90 backdrop-blur-sm border-border font-sans">
                 Featured
               </Badge>
             )}
             {hasDiscount && (
-              <Badge variant="destructive">-{discountPercent}%</Badge>
+              <Badge variant="destructive" className="font-sans">-{discountPercent}%</Badge>
             )}
           </div>
 
@@ -111,8 +111,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
               variant="secondary"
               size="icon"
               className={cn(
-                'h-9 w-9 rounded-full shadow-md',
-                inWishlist && 'text-primary'
+                'h-9 w-9 rounded-full shadow-soft bg-background hover:bg-muted',
+                inWishlist && 'text-destructive'
               )}
               onClick={handleToggleWishlist}
             >
@@ -128,7 +128,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
             transition={{ duration: 0.2 }}
           >
             <Button
-              className="w-full shadow-lg"
+              className="w-full shadow-medium font-sans"
               onClick={handleAddToCart}
               disabled={isAddingToCart}
             >
@@ -140,18 +140,18 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
         {/* Product Info */}
         <div className="mt-4 space-y-1">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-sans">
             {product.category?.name || product.brand}
           </p>
-          <h3 className="font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="font-sans font-medium text-primary line-clamp-2 group-hover:text-muted-foreground transition-colors">
             {product.name}
           </h3>
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-foreground">
+            <span className="font-sans font-semibold text-primary">
               {formatPrice(product.price)}
             </span>
             {hasDiscount && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-sm text-muted-foreground line-through font-sans">
                 {formatPrice(product.compare_at_price!)}
               </span>
             )}
@@ -169,7 +169,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
                 />
               ))}
               {[...new Set(product.variants.map(v => v.color_hex).filter(Boolean))].length > 4 && (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground font-sans">
                   +{[...new Set(product.variants.map(v => v.color_hex).filter(Boolean))].length - 4}
                 </span>
               )}

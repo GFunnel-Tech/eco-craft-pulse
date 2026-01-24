@@ -2,6 +2,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Truck, RefreshCw, Shield, Headphones } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const FEATURES = [
   {
@@ -27,10 +31,38 @@ const FEATURES = [
 ];
 
 export function PromoSection() {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsSubmitting(true);
+
+    const { error } = await supabase
+      .from('newsletter_subscribers')
+      .insert({ email });
+
+    setIsSubmitting(false);
+
+    if (error) {
+      if (error.code === '23505') {
+        toast.info("You're already subscribed!");
+      } else {
+        toast.error('Something went wrong. Please try again.');
+      }
+      return;
+    }
+
+    toast.success('Welcome to the KORR family!');
+    setEmail('');
+  };
+
   return (
     <>
       {/* Feature Banner */}
-      <section className="py-12 bg-cream border-y border-border">
+      <section className="py-12 bg-soft-grey border-y border-border">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {FEATURES.map((feature, index) => (
@@ -42,25 +74,19 @@ export function PromoSection() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-3">
                   <feature.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
+                <h3 className="font-sans font-semibold text-primary">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground font-sans">{feature.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Banner */}
+      {/* CTA Banner with Email Signup */}
       <section className="py-24 bg-secondary text-secondary-foreground relative overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
         <div className="container relative z-10">
           <motion.div
             className="max-w-2xl mx-auto text-center"
@@ -68,30 +94,42 @@ export function PromoSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/20 text-primary text-sm font-medium mb-6">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-secondary-foreground/10 text-secondary-foreground text-sm font-medium mb-6 font-sans tracking-wide">
               Limited Time Offer
             </span>
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
+            <h2 className="font-display text-4xl md:text-5xl font-medium text-secondary-foreground mb-4">
               20% Off Your First Order
             </h2>
-            <p className="text-lg text-secondary-foreground/70 mb-8">
+            <p className="text-lg text-secondary-foreground/70 mb-8 font-sans">
               Join our community and get exclusive access to new drops, limited editions, and member-only discounts.
             </p>
+            
+            {/* Email Signup Form */}
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-6">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 bg-secondary-foreground/10 border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 h-12 font-sans"
+                required
+              />
+              <Button 
+                type="submit" 
+                size="lg"
+                disabled={isSubmitting}
+                className="whitespace-nowrap font-sans"
+              >
+                {isSubmitting ? 'Joining...' : 'Get 20% Off'}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </form>
+
             <div className="flex flex-wrap justify-center gap-4">
               <Button 
                 size="lg" 
-                className="text-base px-8 shadow-coral"
-                asChild
-              >
-                <Link to="/register">
-                  Join Now
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button 
-                size="lg" 
                 variant="outline" 
-                className="text-base px-8 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                className="text-base px-8 border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10 font-sans"
                 asChild
               >
                 <Link to="/shop">

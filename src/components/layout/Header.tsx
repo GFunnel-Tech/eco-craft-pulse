@@ -65,7 +65,7 @@ export function Header() {
               <nav className="flex flex-col gap-6 mt-8">
                 <Link 
                   to="/" 
-                  className="font-display text-2xl font-bold text-primary"
+                  className="font-display text-2xl font-medium text-primary"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {SITE_NAME}
@@ -75,20 +75,20 @@ export function Header() {
                     <Link
                       key={item.name}
                       to={item.href}
-                      className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                      className="text-lg font-sans font-medium text-foreground hover:text-muted-foreground transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}
                     </Link>
                   ))}
                 </div>
-                <div className="border-t pt-4">
-                  <p className="text-sm font-semibold text-muted-foreground mb-3">Categories</p>
+                <div className="border-t border-border pt-4">
+                  <p className="text-sm font-sans font-semibold text-muted-foreground mb-3">Categories</p>
                   {NAVIGATION.categories.map((item) => (
                     <Link
                       key={item.name}
                       to={item.href}
-                      className="block py-2 text-foreground hover:text-primary transition-colors"
+                      className="block py-2 font-sans text-foreground hover:text-muted-foreground transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}
@@ -101,7 +101,7 @@ export function Header() {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <span className="font-display text-2xl font-bold tracking-tight text-foreground">
+            <span className="font-display text-2xl font-medium tracking-tight text-primary">
               {SITE_NAME}
             </span>
           </Link>
@@ -112,19 +112,19 @@ export function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                className="text-sm font-sans font-medium text-foreground hover:text-muted-foreground transition-colors"
               >
                 {item.name}
               </Link>
             ))}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-sans font-medium text-foreground hover:text-muted-foreground transition-colors">
                 Categories
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-40">
                 {NAVIGATION.categories.map((item) => (
-                  <DropdownMenuItem key={item.name} asChild>
+                  <DropdownMenuItem key={item.name} asChild className="font-sans">
                     <Link to={item.href}>{item.name}</Link>
                   </DropdownMenuItem>
                 ))}
@@ -153,7 +153,7 @@ export function Header() {
             >
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium">
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-sans font-medium">
                   {wishlistCount}
                 </span>
               )}
@@ -168,7 +168,7 @@ export function Header() {
             >
               <ShoppingBag className="h-5 w-5" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium">
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-sans font-medium">
                   {itemCount}
                 </span>
               )}
@@ -183,27 +183,27 @@ export function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="font-sans">
                     <Link to="/account">My Account</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="font-sans">
                     <Link to="/account?tab=orders">Orders</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="font-sans">
                     <Link to="/account?tab=wishlist">Wishlist</Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin" className="text-primary font-medium">
+                      <DropdownMenuItem asChild className="font-sans">
+                        <Link to="/admin" className="font-medium">
                           Admin Portal
                         </Link>
                       </DropdownMenuItem>
                     </>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
+                  <DropdownMenuItem onClick={handleSignOut} className="font-sans">
                     Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -234,7 +234,7 @@ export function Header() {
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="pl-10 pr-10 font-sans"
                     autoFocus
                   />
                   <Button
