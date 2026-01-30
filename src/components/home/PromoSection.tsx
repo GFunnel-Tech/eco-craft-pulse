@@ -128,8 +128,8 @@ export function PromoSection() {
             <div className="flex flex-wrap justify-center gap-4">
               <Button 
                 size="lg" 
-                variant="outline" 
-                className="text-base px-8 border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10 font-sans"
+                variant="outline-inverse" 
+                className="text-base px-8 font-sans"
                 asChild
               >
                 <Link to="/shop">
