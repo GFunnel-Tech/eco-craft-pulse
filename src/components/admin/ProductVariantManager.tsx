@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BulkVariantGenerator } from "./BulkVariantGenerator";
 
 export interface ProductVariant {
   id?: string;
@@ -90,6 +91,10 @@ export function ProductVariantManager({
       .map(v => [v.color_hex, { color: v.color!, hex: v.color_hex! }])
   ).values()];
 
+  const handleBulkGenerate = (newVariants: ProductVariant[]) => {
+    onChange([...variants, ...newVariants]);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -99,10 +104,17 @@ export function ProductVariantManager({
             Add size and color combinations with individual stock levels
           </p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={addVariant}>
-          <Plus className="h-4 w-4 mr-1" />
-          Add Variant
-        </Button>
+        <div className="flex gap-2">
+          <BulkVariantGenerator
+            productSku={productSku}
+            existingVariants={variants}
+            onGenerate={handleBulkGenerate}
+          />
+          <Button type="button" variant="outline" size="sm" onClick={addVariant}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add Variant
+          </Button>
+        </div>
       </div>
 
       {uniqueColors.length > 0 && (
