@@ -17,6 +17,9 @@ import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
+import Collections from "./pages/Collections";
+import About from "./pages/About";
+import { ShippingPage, ReturnsPage, ContactPage, FAQPage, PrivacyPage, TermsPage } from "./pages/InfoPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
@@ -46,6 +49,14 @@ const App = () => (
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmation />} />
                 <Route path="/account" element={<Account />} />
+                <Route path="/collections" element={<Collections />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/shipping" element={<ShippingPage />} />
+                <Route path="/returns" element={<ReturnsPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/faq" element={<FAQPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/products" element={<AdminProducts />} />
                 <Route path="/admin/orders" element={<AdminOrders />} />
