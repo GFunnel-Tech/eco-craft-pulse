@@ -1,1 +1,4 @@
 project_id = "mzjgzdhhvfcodaqfmgqi"
+
+[functions.update-tracking]
+verify_jwt = false

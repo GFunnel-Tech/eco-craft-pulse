@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { getTrackingUrl, SUPPORTED_CARRIERS } from "@/lib/tracking";
 import {
   Table,
   TableBody,
@@ -27,7 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Search, Eye, Clock, CheckCircle, Truck, Package, XCircle } from "lucide-react";
+import { Search, Eye, Clock, CheckCircle, Truck, Package, XCircle, ExternalLink } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -137,6 +139,25 @@ export default function AdminOrders() {
     } catch (error) {
       console.error("Error updating order:", error);
       toast.error("Failed to update order");
+    }
+  };
+
+  const handleUpdateTracking = async (orderId: string, trackingNumber: string, trackingCarrier: string) => {
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update({ tracking_number: trackingNumber || null, tracking_carrier: trackingCarrier || null })
+        .eq("id", orderId);
+
+      if (error) throw error;
+      toast.success("Tracking info updated");
+      fetchOrders();
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder({ ...selectedOrder, tracking_number: trackingNumber || null, tracking_carrier: trackingCarrier || null });
+      }
+    } catch (error) {
+      console.error("Error updating tracking:", error);
+      toast.error("Failed to update tracking");
     }
   };
 
@@ -284,6 +305,62 @@ export default function AdminOrders() {
                   </CardContent>
                 </Card>
               </div>
+
+              <Card>
+                <CardHeader><CardTitle className="text-base">Tracking</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Tracking Number</Label>
+                      <Input
+                        placeholder="Enter tracking number"
+                        defaultValue={selectedOrder.tracking_number || ""}
+                        id="tracking-number-input"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Carrier</Label>
+                      <Select
+                        defaultValue={selectedOrder.tracking_carrier?.toLowerCase() || ""}
+                        onValueChange={() => {}}
+                      >
+                        <SelectTrigger id="tracking-carrier-select">
+                          <SelectValue placeholder="Select carrier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SUPPORTED_CARRIERS.map((c) => (
+                            <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const numEl = document.getElementById("tracking-number-input") as HTMLInputElement;
+                        const carrierEl = document.querySelector<HTMLButtonElement>("#tracking-carrier-select");
+                        const carrier = carrierEl?.textContent || "";
+                        const carrierValue = SUPPORTED_CARRIERS.find(c => c.label === carrier)?.value || carrier;
+                        handleUpdateTracking(selectedOrder.id, numEl?.value || "", carrierValue);
+                      }}
+                    >
+                      Save Tracking
+                    </Button>
+                    {selectedOrder.tracking_number && (
+                      <a
+                        href={getTrackingUrl(selectedOrder.tracking_number, selectedOrder.tracking_carrier)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Track Package <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </DialogContent>
