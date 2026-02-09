@@ -2,3 +2,6 @@ project_id = "mzjgzdhhvfcodaqfmgqi"
 
 [functions.update-tracking]
 verify_jwt = false
+
+[functions.klaviyo-subscribe]
+verify_jwt = false

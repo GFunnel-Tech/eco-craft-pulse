@@ -17,18 +17,14 @@ export function Footer() {
 
     setIsSubscribing(true);
     
-    const { error } = await supabase
-      .from('newsletter_subscribers')
-      .insert({ email });
+    const { error } = await supabase.functions.invoke('klaviyo-subscribe', {
+      body: { email },
+    });
     
     setIsSubscribing(false);
     
     if (error) {
-      if (error.code === '23505') {
-        toast.info('You\'re already subscribed!');
-      } else {
-        toast.error('Failed to subscribe. Please try again.');
-      }
+      toast.error('Failed to subscribe. Please try again.');
       return;
     }
     
