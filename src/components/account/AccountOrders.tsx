@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, ChevronRight, Truck, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { Package, ChevronRight, Truck, CheckCircle2, Clock, XCircle, ExternalLink } from 'lucide-react';
+import { getTrackingUrl } from '@/lib/tracking';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -207,7 +208,15 @@ export function AccountOrders() {
                       <div className="flex items-center gap-2 text-sm">
                         <Truck className="h-4 w-4 text-primary" />
                         <span className="text-muted-foreground">Tracking:</span>
-                        <span className="font-medium">{order.tracking_number}</span>
+                        <a
+                          href={getTrackingUrl(order.tracking_number!, order.tracking_carrier)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          {order.tracking_number}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
                         {order.tracking_carrier && (
                           <span className="text-muted-foreground">({order.tracking_carrier})</span>
                         )}
