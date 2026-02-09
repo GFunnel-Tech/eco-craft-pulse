@@ -12,7 +12,7 @@ export function HeroSection() {
         <img
           src={heroImage}
           alt="Athletic performance wear"
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/90 to-secondary/60" />
       </div>
