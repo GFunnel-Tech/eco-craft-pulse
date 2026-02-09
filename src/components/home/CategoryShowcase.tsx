@@ -12,18 +12,21 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import tennisCourtImage from '@/assets/tennis-court.jpg';
+import fitnessModelImage from '@/assets/fitness-model.jpeg';
+import groupFitnessImage from '@/assets/group-fitness.jpg';
 
 // Fallback images for categories without images
 const FALLBACK_IMAGES: Record<string, string> = {
   men: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1000&auto=format&fit=crop',
-  women: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=1000&auto=format&fit=crop',
+  women: fitnessModelImage,
   accessories: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=1000&auto=format&fit=crop',
-  tennis: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?q=80&w=1000&auto=format&fit=crop',
+  tennis: tennisCourtImage,
   golf: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?q=80&w=1000&auto=format&fit=crop',
   yoga: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1000&auto=format&fit=crop',
-  training: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop',
+  training: groupFitnessImage,
   running: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?q=80&w=1000&auto=format&fit=crop',
-  default: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000&auto=format&fit=crop',
+  default: fitnessModelImage,
 };
 
 export function CategoryShowcase() {
