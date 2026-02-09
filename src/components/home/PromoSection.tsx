@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import groupFitnessImage from '@/assets/group-fitness.jpg';
+import navyPoseImage from '@/assets/navy-pose.jpg';
 
 const FEATURES = [
   {
@@ -61,6 +63,48 @@ export function PromoSection() {
 
   return (
     <>
+      {/* Lifestyle Image Banner */}
+      <section className="py-0 bg-background">
+        <div className="container py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <motion.div
+              className="relative aspect-[3/4] rounded-lg overflow-hidden"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <img
+                src={navyPoseImage}
+                alt="KORR athletic wear - navy collection"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6">
+                <h3 className="font-display text-2xl text-primary-foreground font-medium">Built to Move</h3>
+                <p className="text-primary-foreground/80 font-sans text-sm mt-1">Performance meets style</p>
+              </div>
+            </motion.div>
+            <motion.div
+              className="relative aspect-[3/4] rounded-lg overflow-hidden"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <img
+                src={groupFitnessImage}
+                alt="KORR team fitness collection"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6">
+                <h3 className="font-display text-2xl text-primary-foreground font-medium">Stronger Together</h3>
+                <p className="text-primary-foreground/80 font-sans text-sm mt-1">Train with confidence</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Feature Banner */}
       <section className="py-12 bg-soft-grey border-y border-border">
         <div className="container">

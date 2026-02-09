@@ -2,17 +2,17 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import heroImage from '@/assets/tennis-white.png';
 
 export function HeroSection() {
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-background">
       {/* Background Image */}
       <div className="absolute inset-0">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070&auto=format&fit=crop')`,
-          }}
+        <img
+          src={heroImage}
+          alt="Athletic performance wear"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/90 to-secondary/60" />
       </div>
