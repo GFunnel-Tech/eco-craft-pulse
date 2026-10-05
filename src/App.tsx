@@ -30,6 +30,26 @@ import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
+// Redirects users flagged with must_change_password to the forced password change page
+const ForcePasswordChangeGuard = () => {
+  const { user, profile, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (
+      !isLoading &&
+      user &&
+      profile?.must_change_password &&
+      location.pathname !== "/force-change-password"
+    ) {
+      navigate("/force-change-password", { replace: true });
+    }
+  }, [user, profile, isLoading, location.pathname, navigate]);
+
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
