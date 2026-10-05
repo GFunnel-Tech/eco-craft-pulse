@@ -503,6 +503,7 @@ export type Database = {
           id: string
           last_name: string | null
           marketing_opt_in: boolean | null
+          must_change_password: boolean
           phone: string | null
           updated_at: string
           user_id: string
@@ -515,6 +516,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           marketing_opt_in?: boolean | null
+          must_change_password?: boolean
           phone?: string | null
           updated_at?: string
           user_id: string
@@ -527,6 +529,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           marketing_opt_in?: boolean | null
+          must_change_password?: boolean
           phone?: string | null
           updated_at?: string
           user_id?: string
